@@ -257,6 +257,8 @@ func (ep *Epoll) wait(onError func(error)) {
 		ep.mu.RLock()
 		for i := 0; i < n; i++ {
 			fd := int(events[i].Fd)
+			println("wait n:", n, " fd:", fd)
+
 			if fd == ep.eventFd { // signal to close
 				ep.mu.RUnlock()
 				return
