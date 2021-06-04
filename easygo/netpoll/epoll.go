@@ -95,7 +95,7 @@ func EpollCreate(c *EpollConfig) (*Epoll, error) {
 		return nil, errno
 	}
 	eventFd := int(r0)
-	println("EpollCreate eventFd:", eventFd)
+	println("EpollCreate fd:", fd, " eventFd:", eventFd)
 
 	// Set finalizer for write end of socket pair to avoid data races when
 	// closing Epoll instance and EBADF errors on writing ctl bytes from callers.
