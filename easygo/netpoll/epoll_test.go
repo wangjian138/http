@@ -81,6 +81,7 @@ func TestEpollServer(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer unix.Close(ln)
+	println("listen(4444) ln:", ln)
 
 	var received bytes.Buffer
 	done := make(chan struct{})
@@ -92,7 +93,7 @@ func TestEpollServer(t *testing.T) {
 			return
 		}
 
-		println("TestEpollServer ln:%v", ln)
+		println("TestEpollServer ln:", ln)
 		// Accept new incoming connection.
 		conn, _, err := unix.Accept(ln)
 		if err != nil {
@@ -127,7 +128,7 @@ func TestEpollServer(t *testing.T) {
 	})
 
 	conn, err := dial(4444)
-	println("conn:", conn)
+	println("dial(4444) conn:", conn)
 	if err != nil {
 		t.Fatal(err)
 	}
