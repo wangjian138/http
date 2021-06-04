@@ -52,14 +52,14 @@ func OpenPoller() (poller *Poller, err error) {
 		err = os.NewSyscallError("epoll_create1", err)
 		return
 	}
-	println(poller.fd)
+	println("poller.fd:", poller.fd)
 	if poller.wfd, err = unix.Eventfd(0, unix.EFD_NONBLOCK|unix.EFD_CLOEXEC); err != nil {
 		_ = poller.Close()
 		poller = nil
 		err = os.NewSyscallError("eventfd", err)
 		return
 	}
-	println(poller.wfd)
+	println("poller.wfd", poller.wfd)
 	poller.wfdBuf = make([]byte, 8)
 	if err = poller.AddRead(poller.wfd); err != nil {
 		_ = poller.Close()
