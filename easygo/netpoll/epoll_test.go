@@ -93,12 +93,13 @@ func TestEpollServer(t *testing.T) {
 			return
 		}
 
-		println("TestEpollServer ln:", ln)
 		// Accept new incoming connection.
 		conn, _, err := unix.Accept(ln)
 		if err != nil {
 			t.Fatalf("could not accept: %s", err)
 		}
+
+		println("TestEpollServer ln:", ln, " conn:", conn)
 
 		// Socket must not block read() from it.
 		_ = unix.SetNonblock(conn, true)
