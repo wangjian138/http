@@ -136,7 +136,7 @@ func TestEpollServer(t *testing.T) {
 	// Write some data bytes one by one to the conn.
 	data := []byte("hello, epoll!")
 	for i := 0; i < len(data); i++ {
-		println("unix.Write data:%v", string(data[i:i+1]))
+		println("unix.Write data:", string(data[i:i+1]))
 		if _, err := unix.Write(conn, data[i:i+1]); err != nil {
 			t.Fatalf("could not make %d-th write (%v): %s", i, string(data[i]), err)
 		}
