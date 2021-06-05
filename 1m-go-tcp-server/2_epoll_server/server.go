@@ -9,6 +9,7 @@ import (
 	"net"
 	"net/http"
 	_ "net/http/pprof"
+	"os"
 	"reflect"
 	"sync"
 	"syscall"
@@ -86,7 +87,7 @@ func start() {
 			if conn == nil {
 				break
 			}
-			if _, err := conn.Read(buf[:]); err != nil {
+			if _, err := conn.Read(buf); err != nil {
 				if err := epoller.Remove(conn); err != nil {
 					log.Printf("failed to remove %v", err)
 				}
@@ -133,10 +134,15 @@ func MkEpoll() (*epoll, error) {
 func (e *epoll) Add(conn net.Conn) error {
 	// Extract file descriptor associated with the connection
 	fd := socketFD(conn)
-	err := unix.EpollCtl(e.fd, syscall.EPOLL_CTL_ADD, fd, &unix.EpollEvent{Events: unix.POLLIN | unix.POLLHUP, Fd: int32(fd)})
+	err := unix.EpollCtl(e.fd, syscall.EPOLL_CTL_ADD, fd, &unix.EpollEvent{Events: unix.POLLIN | unix.POLLHUP | unix.EPOLLET, Fd: int32(fd)})
 	if err != nil {
 		return err
 	}
+	//设置成非阻塞
+	if err = os.NewSyscallError("fcntl nonblock", unix.SetNonblock(fd, true)); err != nil {
+		return err
+	}
+
 	e.lock.Lock()
 	defer e.lock.Unlock()
 	e.connections[fd] = conn
@@ -171,6 +177,7 @@ retry:
 		}
 		return nil, err
 	}
+
 	e.lock.RLock()
 	defer e.lock.RUnlock()
 	var connections []net.Conn
