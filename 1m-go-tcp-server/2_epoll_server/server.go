@@ -1,6 +1,9 @@
 package main
 
 import (
+	"io"
+	"io/ioutil"
+	"learn/http/bytebufferpool"
 	"log"
 	"net"
 	"net/http"
@@ -42,12 +45,27 @@ func main() {
 			log.Printf("accept err: %v", e)
 			return
 		}
+		log.Printf("进行处理")
+		handleConn(conn)
 
 		if err := epoller.Add(conn); err != nil {
 			log.Printf("failed to add connection %v", err)
 			conn.Close()
 		}
 	}
+}
+
+func handleConn(conn net.Conn) {
+	byteBufferPool := bytebufferpool.Get()
+	for {
+		n, err := byteBufferPool.ReadFrom(conn)
+		log.Printf("handleConn v:%v n:%v err:%v", string(byteBufferPool.B), n, err)
+		if err != nil || n == 0 {
+			break
+		}
+	}
+	bytebufferpool.Put(byteBufferPool)
+	io.Copy(ioutil.Discard, conn)
 }
 
 func start() {
