@@ -3,6 +3,7 @@ package main
 import (
 	"io"
 	"io/ioutil"
+	"learn/http/bytebufferpool"
 	"log"
 	"net"
 	"net/http"
@@ -52,9 +53,10 @@ func main() {
 }
 
 func handleConn(conn net.Conn) {
+	byteBufferPool := bytebufferpool.Get()
 	var buf [128]byte
 	for {
-		n, err := conn.Read(buf[:])
+		n, err := byteBufferPool.ReadFrom(conn)
 		if err != nil {
 			break
 		}
