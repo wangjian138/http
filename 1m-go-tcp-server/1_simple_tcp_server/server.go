@@ -60,8 +60,8 @@ func handleConn(conn net.Conn) {
 			break
 		}
 		log.Printf("handleConn v:%v n:%v", string(byteBufferPool.B), n)
-
 	}
+	bytebufferpool.Put(byteBufferPool)
 	io.Copy(ioutil.Discard, conn)
 }
 
