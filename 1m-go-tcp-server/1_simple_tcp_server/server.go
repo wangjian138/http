@@ -52,6 +52,15 @@ func main() {
 }
 
 func handleConn(conn net.Conn) {
+	var buf [128]byte
+	for {
+		n, err := conn.Read(buf[:])
+		if err != nil {
+			break
+		}
+		log.Printf("handleConn v:%v", string(buf[:n]))
+
+	}
 	io.Copy(ioutil.Discard, conn)
 }
 
