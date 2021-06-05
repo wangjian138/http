@@ -15,7 +15,10 @@ import (
 	"time"
 )
 
-var epoller *epoll
+var (
+	epoller  *epoll
+	netCount int
+)
 
 func main() {
 	setLimit()
@@ -89,7 +92,8 @@ func start() {
 				}
 				conn.Close()
 			}
-			log.Printf("start buf:%v", string(buf))
+			netCount++
+			log.Printf("start netCount:%v buf:%v ", netCount, string(buf))
 			time.Sleep(1 * time.Second)
 		}
 	}
