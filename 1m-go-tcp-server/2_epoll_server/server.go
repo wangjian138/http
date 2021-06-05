@@ -54,6 +54,8 @@ func main() {
 			return
 		}
 
+		_ = unix.SetNonblock(socketFD(conn), true)
+
 		log.Printf("Accept conn:%v", conn)
 		if err := epoller.Add(conn); err != nil {
 			log.Printf("failed to add connection %v", err)
@@ -136,10 +138,6 @@ func (e *epoll) Add(conn net.Conn) error {
 	fd := socketFD(conn)
 	err := unix.EpollCtl(e.fd, syscall.EPOLL_CTL_ADD, fd, &unix.EpollEvent{Events: unix.POLLIN | unix.POLLHUP | unix.EPOLLET, Fd: int32(fd)})
 	if err != nil {
-		return err
-	}
-	//设置成非阻塞
-	if err = os.NewSyscallError("fcntl nonblock", unix.SetNonblock(fd, true)); err != nil {
 		return err
 	}
 
