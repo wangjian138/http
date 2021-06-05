@@ -94,7 +94,7 @@ func start() {
 			}
 			netCount++
 			log.Printf("start netCount:%v buf:%v ", netCount, string(buf))
-			time.Sleep(1 * time.Second)
+			time.Sleep(3 * time.Second)
 		}
 	}
 }
