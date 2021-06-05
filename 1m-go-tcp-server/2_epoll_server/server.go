@@ -9,7 +9,6 @@ import (
 	"net"
 	"net/http"
 	_ "net/http/pprof"
-	"os"
 	"reflect"
 	"sync"
 	"syscall"
