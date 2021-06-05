@@ -97,7 +97,7 @@ func start(epoller *epoll) {
 				conn.Close()
 			}
 			log.Printf("start buf:%v ", string(buf))
-			time.Sleep(3 * time.Second)
+			time.Sleep(1 * time.Second)
 		}
 	}
 }
