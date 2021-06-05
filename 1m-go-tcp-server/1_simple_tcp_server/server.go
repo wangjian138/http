@@ -58,7 +58,7 @@ func handleConn(conn net.Conn) {
 		if err != nil {
 			break
 		}
-		log.Printf("handleConn v:%v", string(buf[:n]))
+		log.Printf("handleConn v:%v n:%v", string(buf[:n]), n)
 
 	}
 	io.Copy(ioutil.Discard, conn)
