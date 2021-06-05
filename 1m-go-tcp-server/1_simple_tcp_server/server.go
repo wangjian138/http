@@ -54,13 +54,12 @@ func main() {
 
 func handleConn(conn net.Conn) {
 	byteBufferPool := bytebufferpool.Get()
-	var buf [128]byte
 	for {
 		n, err := byteBufferPool.ReadFrom(conn)
 		if err != nil {
 			break
 		}
-		log.Printf("handleConn v:%v n:%v", string(buf[:n]), n)
+		log.Printf("handleConn v:%v n:%v", string(byteBufferPool.B), n)
 
 	}
 	io.Copy(ioutil.Discard, conn)
