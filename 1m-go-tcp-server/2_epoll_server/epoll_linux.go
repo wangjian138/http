@@ -33,7 +33,7 @@ func MkEpoll() (*epoll, error) {
 func (e *epoll) Add(conn net.Conn) error {
 	// Extract file descriptor associated with the connection
 	fd := socketFD(conn)
-	err := unix.EpollCtl(e.fd, syscall.EPOLL_CTL_ADD, fd, &unix.EpollEvent{Events: unix.POLLIN | unix.POLLHUP, Fd: int32(fd)})
+	err := unix.EpollCtl(e.fd, syscall.EPOLL_CTL_ADD, fd, &unix.EpollEvent{Events: unix.POLLIN | unix.POLLHUP | unix.EPOLLET, Fd: int32(fd)})
 	if err != nil {
 		return err
 	}
