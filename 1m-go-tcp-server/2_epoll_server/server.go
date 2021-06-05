@@ -12,6 +12,7 @@ import (
 	"reflect"
 	"sync"
 	"syscall"
+	"time"
 )
 
 var epoller *epoll
@@ -89,6 +90,7 @@ func start() {
 				conn.Close()
 			}
 			log.Printf("start buf:%v", string(buf))
+			time.Sleep(1 * time.Second)
 		}
 	}
 }
