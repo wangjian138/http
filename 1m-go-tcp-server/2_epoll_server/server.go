@@ -48,8 +48,6 @@ func main() {
 			log.Printf("accept err: %v", e)
 			return
 		}
-		log.Printf("进行处理")
-		handleConn(conn)
 
 		if err := epoller.Add(conn); err != nil {
 			log.Printf("failed to add connection %v", err)
@@ -89,6 +87,7 @@ func start() {
 				}
 				conn.Close()
 			}
+			log.Printf("start buf:%v", string(buf))
 		}
 	}
 }
