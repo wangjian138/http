@@ -79,6 +79,30 @@ func startEpoll() {
 }
 
 func start(epoller *epoll) {
+	var buf = make([]byte, 20)
+	for {
+		connections, err := epoller.Wait()
+		if err != nil {
+			log.Printf("failed to epoll wait %v", err)
+			continue
+		}
+		for _, conn := range connections {
+			if conn == nil {
+				break
+			}
+			if _, err := conn.Read(buf); err != nil {
+				if err := epoller.Remove(conn); err != nil {
+					log.Printf("failed to remove %v", err)
+				}
+				conn.Close()
+			}
+			log.Printf("start buf:%v ", string(buf))
+			time.Sleep(3 * time.Second)
+		}
+	}
+}
+
+func start1(epoller *epoll) {
 	for {
 		connections, err := epoller.Wait()
 		if err != nil {
