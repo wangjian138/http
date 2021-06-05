@@ -89,6 +89,7 @@ func start(epoller *epoll) {
 			if conn == nil {
 				break
 			}
+			log.Printf("start 收到数据")
 			io.CopyN(conn, conn, 8)
 			if err != nil {
 				if err := epoller.Remove(conn); err != nil {
