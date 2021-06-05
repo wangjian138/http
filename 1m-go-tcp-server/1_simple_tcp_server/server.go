@@ -57,8 +57,7 @@ func handleConn(conn net.Conn) {
 	for {
 		n, err := byteBufferPool.ReadFrom(conn)
 		log.Printf("handleConn v:%v n:%v err:%v", string(byteBufferPool.B), n, err)
-
-		if err != nil {
+		if err != nil || n == 0 {
 			break
 		}
 	}
