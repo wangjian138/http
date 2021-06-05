@@ -49,6 +49,7 @@ func main() {
 			return
 		}
 
+		log.Printf("Accept conn:%v", conn)
 		if err := epoller.Add(conn); err != nil {
 			log.Printf("failed to add connection %v", err)
 			conn.Close()
@@ -70,7 +71,7 @@ func handleConn(conn net.Conn) {
 }
 
 func start() {
-	var buf = make([]byte, 8)
+	var buf = make([]byte, 20)
 	for {
 		connections, err := epoller.Wait()
 		if err != nil {
