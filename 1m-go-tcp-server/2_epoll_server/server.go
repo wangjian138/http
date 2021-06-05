@@ -86,7 +86,7 @@ func start() {
 			if conn == nil {
 				break
 			}
-			if _, err := conn.Read(buf); err != nil {
+			if _, err := conn.Read(buf[:]); err != nil {
 				if err := epoller.Remove(conn); err != nil {
 					log.Printf("failed to remove %v", err)
 				}
