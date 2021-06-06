@@ -205,9 +205,9 @@ func TestListen(t *testing.T) {
 
 	for {
 		println("TestListen ", ln)
-		conn, sa, err := unix.Accept(ln)
+		conn, _, err := unix.Accept(ln)
 		if err != nil {
-			t.Fatalf("could not accept: sa:%v err:%v", sa, err)
+			t.Errorf("could not accept: err:%v", err)
 		}
 
 		println("TestEpollServer ln:", ln, " conn:", conn)
