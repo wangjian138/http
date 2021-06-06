@@ -231,7 +231,7 @@ func TestListen(t *testing.T) {
 	}
 }
 func TestDial(t *testing.T) {
-	conn, err := dial(4444)
+	conn, err := dial(4443)
 	println("dial(4444) conn:", conn)
 	if err != nil {
 		t.Fatal(err)
