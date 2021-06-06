@@ -203,16 +203,51 @@ func TestListen(t *testing.T) {
 		t.Fatalf("err:%v", err)
 	}
 
+	defer func() {
+		err = unix.Close(ln)
+		if err != nil {
+			t.Errorf("unix.Close(ln) err:%v", err)
+		}
+	}()
+
 	for {
 		println("TestListen ", ln)
 		conn, _, err := unix.Accept(ln)
 		if err != nil {
-			t.Errorf("could not accept: err:%v", err)
+			t.Errorf("TestListen could not accept: err:%v", err)
+			time.Sleep(3 * time.Second)
+			continue
+		}
+		var buf [128]byte
+		for {
+			n, _ := unix.Read(conn, buf[:])
+			if n <= 0 {
+				break
+			}
+			println("TestListen buf[:n]:", string(buf[:n]))
 		}
 
-		println("TestEpollServer ln:", ln, " conn:", conn)
-		time.Sleep(3 * time.Second)
+		println("TestListen ln:", ln, " conn:", conn)
 	}
+}
+func TestDial(t *testing.T) {
+	conn, err := dial(4444)
+	println("dial(4444) conn:", conn)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Write some data bytes one by one to the conn.
+	data := []byte("hello, epoll!")
+	for i := 0; i < len(data); i++ {
+		println("unix.Write data:", string(data[i:i+1]))
+		if _, err := unix.Write(conn, data[i:i+1]); err != nil {
+			t.Fatalf("could not make %d-th write (%v): %s", i, string(data[i]), err)
+		}
+		time.Sleep(time.Millisecond)
+	}
+
+	unix.Close(conn)
 }
 
 // RunEchoServer starts tcp echo server.
