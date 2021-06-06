@@ -7,6 +7,7 @@ import (
 	"io"
 	"net"
 	"strings"
+	"syscall"
 	"testing"
 	"time"
 
@@ -198,14 +199,14 @@ func listen(port int) (ln int, err error) {
 }
 
 func TestListen(t *testing.T) {
-	ln, err := listen(4444)
+	ln, err := listen(4443)
 	if err != nil {
 		t.Fatalf("err:%v", err)
 	}
 
 	for {
-		println("TestListen")
-		conn, _, err := unix.Accept(ln)
+		println("TestListen ", ln)
+		conn, _, err := unix.Accept4(ln, syscall.SOCK_NONBLOCK|syscall.SOCK_CLOEXEC)
 		if err != nil {
 			t.Fatalf("could not accept: %s", err)
 		}
