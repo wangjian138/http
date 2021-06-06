@@ -197,6 +197,23 @@ func listen(port int) (ln int, err error) {
 	return
 }
 
+func TestListen(t *testing.T) {
+	ln, err := listen(4444)
+	if err != nil {
+		t.Fatalf("err:%v", err)
+	}
+
+	for {
+		println("TestListen")
+		conn, _, err := unix.Accept(ln)
+		if err != nil {
+			t.Fatalf("could not accept: %s", err)
+		}
+
+		println("TestEpollServer ln:", ln, " conn:", conn)
+	}
+}
+
 // RunEchoServer starts tcp echo server.
 func RunEchoServer(tb testing.TB) net.Listener {
 	ln, err := net.Listen("tcp", "localhost:")

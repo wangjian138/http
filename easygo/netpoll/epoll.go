@@ -265,7 +265,6 @@ func (ep *Epoll) wait(onError func(error)) {
 			}
 			callbacks[i] = ep.callbacks[fd]
 			println("wait n:", n, " fd:", fd, " callbacks[i]:", callbacks[i] == nil)
-
 		}
 		ep.mu.RUnlock()
 
