@@ -176,7 +176,7 @@ func dial(port int) (conn int, err error) {
 }
 
 func listen(port int) (ln int, err error) {
-	ln, err = unix.Socket(unix.AF_INET, unix.O_NONBLOCK|unix.SOCK_STREAM, 0)
+	ln, err = unix.Socket(unix.AF_INET, unix.SOCK_STREAM, 0)
 	if err != nil {
 		return
 	}
