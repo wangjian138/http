@@ -211,6 +211,7 @@ func TestListen(t *testing.T) {
 		}
 
 		println("TestEpollServer ln:", ln, " conn:", conn)
+		time.Sleep(3 * time.Second)
 	}
 }
 
