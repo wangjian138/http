@@ -233,6 +233,16 @@ func TestListen(t *testing.T) {
 
 func TestDial(t *testing.T) {
 	conn, err := dial(4443)
+	defer unix.Close(conn)
+	println("dial(4444) conn:", conn)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestDialAndSend(t *testing.T) {
+	conn, err := dial(4443)
+	defer unix.Close(conn)
 	println("dial(4444) conn:", conn)
 	if err != nil {
 		t.Fatal(err)
@@ -248,7 +258,6 @@ func TestDial(t *testing.T) {
 		time.Sleep(time.Millisecond)
 	}
 
-	unix.Close(conn)
 }
 
 // RunEchoServer starts tcp echo server.

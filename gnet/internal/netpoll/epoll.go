@@ -128,6 +128,7 @@ func (p *Poller) Polling(callback func(fd int, ev uint32) error) error {
 				_, _ = unix.Read(p.wfd, p.wfdBuf)
 			}
 		}
+		fmt.Printf("Polling wakenUp:%v\n", wakenUp)
 
 		if wakenUp {
 			wakenUp = false

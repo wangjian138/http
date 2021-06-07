@@ -49,6 +49,7 @@ func (svr *server) acceptNewConnection(fd int) error {
 	fmt.Printf("acceptNewConnection nfd:%+v sa:%+v netAddr:%+v\n", nfd, sa, netAddr)
 
 	err = el.poller.Trigger(func() (err error) {
+		fmt.Printf("acceptNewConnection Trigger nfd:%v\n", nfd)
 		if err = el.poller.AddRead(nfd); err != nil {
 			_ = unix.Close(nfd)
 			c.releaseTCP()
