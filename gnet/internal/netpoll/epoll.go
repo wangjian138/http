@@ -65,6 +65,7 @@ func OpenPoller() (poller *Poller, err error) {
 		poller = nil
 		return
 	}
+	fmt.Printf("OpenPoller poller:%+v\n", poller)
 	poller.asyncTaskQueue = queue.NewLockFreeQueue()
 	return
 }

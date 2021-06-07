@@ -23,6 +23,7 @@
 package gnet
 
 import (
+	"fmt"
 	"os"
 
 	"golang.org/x/sys/unix"
@@ -45,6 +46,7 @@ func (svr *server) acceptNewConnection(fd int) error {
 	netAddr := socket.SockaddrToTCPOrUnixAddr(sa)
 	el := svr.lb.next(netAddr)
 	c := newTCPConn(nfd, el, sa, netAddr)
+	fmt.Printf("acceptNewConnection nfd:%+v sa:%+v netAddr:%+v\n", nfd, sa, netAddr)
 
 	err = el.poller.Trigger(func() (err error) {
 		if err = el.poller.AddRead(nfd); err != nil {
