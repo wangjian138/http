@@ -240,7 +240,7 @@ func TestDial(t *testing.T) {
 	}
 }
 
-func TestDial1AndSend(t *testing.T) {
+func TestDia1l1AndSend(t *testing.T) {
 	conn, err := dial(4443)
 	defer unix.Close(conn)
 	println("dial(4444) conn:", conn)
