@@ -24,6 +24,7 @@
 package netpoll
 
 import (
+	"fmt"
 	"os"
 	"runtime"
 	"sync/atomic"
@@ -112,6 +113,7 @@ func (p *Poller) Polling(callback func(fd int, ev uint32) error) error {
 		msec = 0
 
 		for i := 0; i < n; i++ {
+			fmt.Printf("Polling i:%v p.wfd:%v  event:%+v \n", i, p.wfd, el.events[i])
 			if fd := int(el.events[i].Fd); fd != p.wfd {
 				switch err = callback(fd, el.events[i].Events); err {
 				case nil:

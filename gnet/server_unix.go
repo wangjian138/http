@@ -136,6 +136,7 @@ func (svr *server) activateEventLoops(numEventLoop int) (err error) {
 }
 
 func (svr *server) activateReactors(numEventLoop int) error {
+	println("activateReactors svr.ln:", svr.ln)
 	for i := 0; i < numEventLoop; i++ {
 		if p, err := netpoll.OpenPoller(); err == nil {
 			el := new(eventloop)

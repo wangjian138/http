@@ -86,7 +86,7 @@ func main() {
 	var multicore bool
 
 	// Example command: go run http.go --port 8080 --multicore=true
-	flag.IntVar(&port, "port", 8080, "server port")
+	flag.IntVar(&port, "port", 4443, "server port")
 	flag.BoolVar(&multicore, "multicore", true, "multicore")
 	flag.Parse()
 
