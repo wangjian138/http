@@ -230,6 +230,7 @@ func TestListen(t *testing.T) {
 		println("TestListen ln:", ln, " conn:", conn)
 	}
 }
+
 func TestDial(t *testing.T) {
 	conn, err := dial(4443)
 	println("dial(4444) conn:", conn)
