@@ -89,8 +89,8 @@ var (
 func (p *Poller) Trigger(task queue.Task) (err error) {
 	p.asyncTaskQueue.Enqueue(task)
 	if atomic.CompareAndSwapInt32(&p.netpollWakeSig, 0, 1) {
-		for _, err = unix.Write(p.wfd, b); err == unix.EINTR || err == unix.EAGAIN; _, err = unix.Write(p.wfd, b) {
-		}
+		//for _, err = unix.Write(p.wfd, b); err == unix.EINTR || err == unix.EAGAIN; _, err = unix.Write(p.wfd, b) {
+		//}
 	}
 	return os.NewSyscallError("write", err)
 }
