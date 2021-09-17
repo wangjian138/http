@@ -5,12 +5,11 @@
 <a title="Codecov" target="_blank" href="https://codecov.io/gh/panjf2000/gnet"><img src="https://img.shields.io/codecov/c/github/panjf2000/gnet?style=flat-square&logo=codecov" /></a>
 <a title="Supported Platforms" target="_blank" href="https://learn/http/gnet"><img src="https://img.shields.io/badge/platform-Linux%20%7C%20FreeBSD%20%7C%20DragonFly%20%7C%20Darwin%20%7C%20Windows-549688?style=flat-square&logo=launchpad" /></a>
 <a title="Require Go Version" target="_blank" href="https://learn/http/gnet"><img src="https://img.shields.io/badge/go-%3E%3D1.9-30dff3?style=flat-square&logo=go" /></a>
-<a title="On XS" target="_blank" href="https://xscode.com/panjf2000/gnet"><img src="https://img.shields.io/badge/Available%20on-xs%3Acode-4b5cc4?style=flat-square&logo=cash-app" /></a>
 <br />
+<a title="On XS" target="_blank" href="https://xscode.com/panjf2000/gnet"><img src="https://img.shields.io/badge/Available%20on-xs%3Acode-4b5cc4?style=flat-square&logo=cash-app" /></a>
 <a title="Chat Room" target="_blank" href="https://gitter.im/gnet-io/gnet?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=body_badge"><img src="https://badges.gitter.im/gnet-io/gnet.svg" /></a>
 <a title="Go Report Card" target="_blank" href="https://goreportcard.com/report/learn/http/gnet"><img src="https://goreportcard.com/badge/learn/http/gnet?style=flat-square" /></a>
 <a title="Doc for gnet" target="_blank" href="https://pkg.go.dev/learn/http/gnet?tab=doc"><img src="https://img.shields.io/badge/go.dev-doc-007d9c?style=flat-square&logo=read-the-docs" /></a>
-<a title="gnet on Sourcegraph" target="_blank" href="https://sourcegraph.com/learn/http/gnet?badge"><img src="https://sourcegraph.com/learn/http/gnet/-/badge.svg?style=flat-square" /></a>
 <a title="Mentioned in Awesome Go" target="_blank" href="https://github.com/avelino/awesome-go#networking"><img src="https://awesome.re/mentioned-badge-flat.svg" /></a>
 <a title="Release" target="_blank" href="https://learn/http/gnet/releases"><img src="https://img.shields.io/github/v/release/panjf2000/gnet.svg?color=161823&style=flat-square&logo=smartthings" /></a>
 <a title="Tag" target="_blank" href="https://learn/http/gnet/tags"><img src="https://img.shields.io/github/v/tag/panjf2000/gnet?color=%23ff8936&logo=fitbit&style=flat-square" /></a>
@@ -33,7 +32,7 @@ English | [🇨🇳中文](README_ZH.md)
 
 - [x] [High-performance](#-performance) event-loop under networking model of multiple threads/goroutines
 - [x] Built-in goroutine pool powered by the library [ants](https://github.com/panjf2000/ants)
-- [x] Built-in memory pool with bytes powered by the library [bytebufferpool](https://learn/http/bytebufferpool)
+- [x] Built-in memory pool with bytes powered by the library [bytebufferpool](https://github.com/valyala/bytebufferpool)
 - [x] Lock-free during the entire runtime
 - [x] Concise and easy-to-use APIs
 - [x] Efficient, reusable and scalable memory buffer: Ring-Buffer
@@ -80,52 +79,50 @@ To see the full ranking list, visit [TechEmpower Plaintext Benchmark](https://ww
 ```powershell
 # Machine information
         OS : Ubuntu 20.04/x86_64
-       CPU : 8 processors, AMD EPYC 7K62 48-Core Processor
+       CPU : 8 CPU cores, AMD EPYC 7K62 48-Core Processor
     Memory : 16.0 GiB
 
 # Go version and settings
-Go Version : go1.15.7 linux/amd64
+Go Version : go1.16.5 linux/amd64
 GOMAXPROCS : 8
 
-# Netwokr settings
-TCP connections : 300
-Test duration   : 30s
+# Benchmark parameters
+TCP connections : 500/1000/5000/10000
+Packet size     : 512/1024/2048/4096/8192/16384/32768/65536 bytes
+Test duration   : 15s
 ```
 
-#### Echo Server
+#### [Echo benchmark](https://github.com/gnet-io/gnet-benchmarks)
 
-![](https://learn/http/gnet_benchmarks/raw/master/results/echo_linux.png)
+![](https://learn/http/gnet_benchmarks/raw/master/results/echo_conn_linux.png)
 
-#### HTTP Server
+![](https://learn/http/gnet_benchmarks/raw/master/results/echo_packet_linux.png)
 
-![](https://learn/http/gnet_benchmarks/raw/master/results/http_linux.png)
-
-## On FreeBSD (kqueue)
+## On MacOS (kqueue)
 
 ### Test Environment
 
 ```powershell
 # Machine information
-        OS : macOS Catalina 10.15.7/x86_64
-       CPU : 6-Core Intel Core i7
+        OS : MacOS Big Sur/x86_64
+       CPU : 6 CPU cores, Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz
     Memory : 16.0 GiB
 
-# Go version and configurations
-Go Version : go1.15.7 darwin/amd64
+# Go version and settings
+Go Version : go1.16.5 darwin/amd64
 GOMAXPROCS : 12
 
-# Netwokr settings
-TCP connections : 100
-Test duration   : 20s
+# Benchmark parameters
+TCP connections : 300/400/500/600/700
+Packet size     : 512/1024/2048/4096/8192 bytes
+Test duration   : 15s
 ```
 
-#### Echo Server
+#### [Echo benchmark](https://github.com/gnet-io/gnet-benchmarks)
 
-![](https://learn/http/gnet_benchmarks/raw/master/results/echo_mac.png)
+![](https://learn/http/gnet_benchmarks/raw/master/results/echo_conn_macos.png)
 
-#### HTTP Server
-
-![](https://learn/http/gnet_benchmarks/raw/master/results/http_mac.png)
+![](https://learn/http/gnet_benchmarks/raw/master/results/echo_packet_macos.png)
 
 # 🏛 Website
 
@@ -133,7 +130,7 @@ Please visit the [official website](https://gnet.host/blog/presenting-gnet/) for
 
 # ⚠️ License
 
-Source code in `gnet` is available under the [MIT License](/LICENSE).
+Source files of `gnet` are distributed under the MIT license found in the LICENSE file.
 
 # 👏 Contributors
 
@@ -154,7 +151,7 @@ Please read the [Contributing Guidelines](CONTRIBUTING.md) before opening a PR a
 
 The following companies/organizations use `gnet` as the underlying network service in production.
 
-<a href="https://www.tencent.com"><img src="https://img.taohuawu.club/gallery/tencent_logo.png" width="250" align="middle"/></a>&nbsp;&nbsp;<a href="https://www.iqiyi.com" target="_blank"><img src="https://img.taohuawu.club/gallery/iqiyi-logo.png" width="200" align="middle"/></a>&nbsp;&nbsp;<a href="https://www.mi.com" target="_blank"><img src="https://img.taohuawu.club/gallery/mi-logo.png" width="150" align="middle"/></a>&nbsp;&nbsp;<a href="https://www.360.cn" target="_blank"><img src="https://img.taohuawu.club/gallery/360-logo.png" width="200" align="middle"/></a>&nbsp;&nbsp;<a href="https://tieba.baidu.com/" target="_blank"><img src="https://img.taohuawu.club/gallery/baidu-tieba-logo.png" width="200" align="middle"/></a>
+<a href="https://www.tencent.com"><img src="https://img.taohuawu.club/gallery/tencent_logo.png" width="250" align="middle"/></a>&nbsp;&nbsp;<a href="https://www.iqiyi.com" target="_blank"><img src="https://img.taohuawu.club/gallery/iqiyi-logo.png" width="200" align="middle"/></a>&nbsp;&nbsp;<a href="https://www.mi.com" target="_blank"><img src="https://img.taohuawu.club/gallery/mi-logo.png" width="150" align="middle"/></a>&nbsp;&nbsp;<a href="https://www.360.com" target="_blank"><img src="https://img.taohuawu.club/gallery/360-logo.png" width="200" align="middle"/></a>&nbsp;&nbsp;<a href="https://tieba.baidu.com/" target="_blank"><img src="https://img.taohuawu.club/gallery/baidu-tieba-logo.png" width="200" align="middle"/></a>&nbsp;&nbsp;<a href="https://game.qq.com/" target="_blank"><img src="https://img.taohuawu.club/gallery/tencent-games-logo.jpeg" width="200" align="middle"/></a>
 
 If you have `gnet` integrated into projects, feel free to open a pull request refreshing this list of user cases.
 
@@ -179,9 +176,9 @@ Become a bronze sponsor with a monthly donation of $10 and get your logo on our 
 <img src="https://raw.githubusercontent.com/panjf2000/illustrations/master/payments/AliPay.JPG" width="250" align="middle"/>&nbsp;&nbsp;
 <a href="https://www.paypal.me/R136a1X" target="_blank"><img src="https://raw.githubusercontent.com/panjf2000/illustrations/master/payments/PayPal.JPG" width="250" align="middle"/></a>&nbsp;&nbsp;
 
-# 💴 Donors
+# 💴 Patrons
 
-<a target="_blank" href="https://github.com/patrick-othmer"><img src="https://avatars1.githubusercontent.com/u/8964313" width="100" alt="Patrick Othmer" /></a>&nbsp;<a target="_blank" href="https://learn/http/gnet"><img src="https://avatars2.githubusercontent.com/u/50285334" width="100" alt="Jimmy" /></a>&nbsp;<a target="_blank" href="https://github.com/cafra"><img src="https://avatars0.githubusercontent.com/u/13758306" width="100" alt="ChenZhen" /></a>&nbsp;<a target="_blank" href="https://github.com/yangwenmai"><img src="https://avatars0.githubusercontent.com/u/1710912" width="100" alt="Mai Yang" /></a>&nbsp;<a target="_blank" href="https://github.com/BeijingWks"><img src="https://avatars3.githubusercontent.com/u/33656339" width="100" alt="王开帅" /></a>&nbsp;<a target="_blank" href="https://github.com/refs"><img src="https://avatars3.githubusercontent.com/u/6905948" width="100" alt="Unger Alejandro" /></a>
+<a target="_blank" href="https://github.com/patrick-othmer"><img src="https://avatars1.githubusercontent.com/u/8964313" width="100" alt="Patrick Othmer" /></a>&nbsp;<a target="_blank" href="https://learn/http/gnet"><img src="https://avatars2.githubusercontent.com/u/50285334" width="100" alt="Jimmy" /></a>&nbsp;<a target="_blank" href="https://github.com/cafra"><img src="https://avatars0.githubusercontent.com/u/13758306" width="100" alt="ChenZhen" /></a>&nbsp;<a target="_blank" href="https://github.com/yangwenmai"><img src="https://avatars0.githubusercontent.com/u/1710912" width="100" alt="Mai Yang" /></a>&nbsp;<a target="_blank" href="https://github.com/BeijingWks"><img src="https://avatars3.githubusercontent.com/u/33656339" width="100" alt="王开帅" /></a>&nbsp;<a target="_blank" href="https://github.com/refs"><img src="https://avatars3.githubusercontent.com/u/6905948" width="100" alt="Unger Alejandro" /></a>&nbsp;<a target="_blank" href="https://github.com/Swaggadan"><img src="https://avatars.githubusercontent.com/u/137142" width="100" alt="Swaggadan" /></a>&nbsp;<a target="_blank" href="https://github.com/Wuvist"><img src="https://avatars.githubusercontent.com/u/657796" width="100" alt="Weng Wei" /></a>
 
 # 💵 Paid Support
 

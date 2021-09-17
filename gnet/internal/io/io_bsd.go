@@ -1,4 +1,4 @@
-// Copyright (c) 2019 Andy Pan
+// Copyright (c) 2021 Andy Pan
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -18,20 +18,50 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package bytebuffer
+// +build freebsd dragonfly darwin
 
-import "github.com/valyala/bytebufferpool"
+package io
 
-// ByteBuffer is the alias of bytebufferpool.ByteBuffer.
-type ByteBuffer = bytebufferpool.ByteBuffer
+import (
+	"golang.org/x/sys/unix"
 
-var (
-	// Get returns an empty byte buffer from the pool, exported from gnet/bytebuffer.
-	Get = bytebufferpool.Get
-	// Put returns byte buffer to the pool, exported from gnet/bytebuffer.
-	Put = func(b *ByteBuffer) {
-		if b != nil {
-			bytebufferpool.Put(b)
+	"learn/http/gnet/errors"
+)
+
+// Writev simply calls write() multiple times cuz writev() on BSD-like OS's is not yet implemented in Go.
+func Writev(fd int, iov [][]byte) (int, error) {
+	var sum int
+	for i := range iov {
+		n, err := unix.Write(fd, iov[i])
+		if err != nil {
+			if sum == 0 {
+				sum = n
+			}
+			return sum, err
+		}
+		sum += n
+		if n < len(iov[i]) {
+			return sum, errors.ErrShortWritev
 		}
 	}
-)
+	return sum, nil
+}
+
+// Readv simply calls read() multiple times cuz readv() on BSD-like OS's is not yet implemented in Go.
+func Readv(fd int, iov [][]byte) (int, error) {
+	var sum int
+	for i := range iov {
+		n, err := unix.Read(fd, iov[i])
+		if err != nil {
+			if sum == 0 {
+				sum = n
+			}
+			return sum, err
+		}
+		sum += n
+		if n < len(iov[i]) {
+			return sum, errors.ErrShortReadv
+		}
+	}
+	return sum, nil
+}

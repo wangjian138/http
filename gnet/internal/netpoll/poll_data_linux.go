@@ -18,14 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package queue
+package netpoll
 
-// Task is a asynchronous function.
-type Task func() error
-
-// AsyncTaskQueue is a queue storing asynchronous tasks.
-type AsyncTaskQueue interface {
-	Enqueue(Task)
-	Dequeue() Task
-	Empty() bool
-}
+// PollEventHandler is the callback for I/O events notified by the poller.
+type PollEventHandler func(uint32) error

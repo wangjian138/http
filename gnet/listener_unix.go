@@ -25,24 +25,32 @@ package gnet
 import (
 	"net"
 	"os"
+	"strings"
 	"sync"
-	"time"
 
 	"golang.org/x/sys/unix"
+
 	"learn/http/gnet/errors"
 	"learn/http/gnet/internal/netpoll"
 	"learn/http/gnet/internal/socket"
+	"learn/http/gnet/logging"
 )
 
 type listener struct {
-	once          sync.Once
-	fd            int
-	lnaddr        net.Addr
-	addr, network string
-	sockopts      []socket.Option
+	once           sync.Once
+	fd             int
+	lnaddr         net.Addr
+	addr, network  string
+	sockopts       []socket.Option
+	pollAttachment *netpoll.PollAttachment // listener attachment for poller
 }
 
-func (ln *listener) Dup() (int, string, error) {
+func (ln *listener) packPollAttachment(handler netpoll.PollEventHandler) *netpoll.PollAttachment {
+	ln.pollAttachment = &netpoll.PollAttachment{FD: ln.fd, Callback: handler}
+	return ln.pollAttachment
+}
+
+func (ln *listener) dup() (int, string, error) {
 	return netpoll.Dup(ln.fd)
 }
 
@@ -67,26 +75,22 @@ func (ln *listener) close() {
 	ln.once.Do(
 		func() {
 			if ln.fd > 0 {
-				sniffErrorAndLog(os.NewSyscallError("close", unix.Close(ln.fd)))
+				logging.LogErr(os.NewSyscallError("close", unix.Close(ln.fd)))
 			}
 			if ln.network == "unix" {
-				sniffErrorAndLog(os.RemoveAll(ln.addr))
+				logging.LogErr(os.RemoveAll(ln.addr))
 			}
 		})
 }
 
 func initListener(network, addr string, options *Options) (l *listener, err error) {
 	var sockopts []socket.Option
-	if options.ReusePort {
+	if options.ReusePort || strings.HasPrefix(network, "udp") {
 		sockopt := socket.Option{SetSockopt: socket.SetReuseport, Opt: 1}
 		sockopts = append(sockopts, sockopt)
 	}
-	if network == "tcp" && options.TCPNoDelay == TCPNoDelay {
+	if options.TCPNoDelay == TCPNoDelay && strings.HasPrefix(network, "tcp") {
 		sockopt := socket.Option{SetSockopt: socket.SetNoDelay, Opt: 1}
-		sockopts = append(sockopts, sockopt)
-	}
-	if network == "tcp" && options.TCPKeepAlive > 0 {
-		sockopt := socket.Option{SetSockopt: socket.SetKeepAlive, Opt: int(options.TCPKeepAlive / time.Second)}
 		sockopts = append(sockopts, sockopt)
 	}
 	if options.SocketRecvBuffer > 0 {

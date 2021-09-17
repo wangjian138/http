@@ -23,7 +23,9 @@ package gnet
 import (
 	"time"
 
-	"learn/http/gnet/internal/logging"
+	"go.uber.org/zap/zapcore"
+
+	"learn/http/gnet/logging"
 )
 
 // Option is a function that will set up option.
@@ -61,7 +63,7 @@ type Options struct {
 	LockOSThread bool
 
 	// ReadBufferCap is the maximum number of bytes that can be read from the client when the readable event comes.
-	// The default value is 16KB, it can be reduced to avoid starving subsequent client connections.
+	// The default value is 64KB, it can be reduced to avoid starving subsequent client connections.
 	//
 	// Note that ReadBufferCap will be always converted to the least power of two integer value greater than
 	// or equal to its real amount.
@@ -98,6 +100,16 @@ type Options struct {
 
 	// ICodec encodes and decodes TCP stream.
 	Codec ICodec
+
+	// LogPath the local path where logs will be written, this is the easiest way to set up client logs,
+	// the client instantiates a default uber-go/zap logger with this given log path, you are also allowed to employ
+	// you own logger during the client lifetime by implementing the following log.Logger interface.
+	//
+	// Note that this option can be overridden by the option Logger.
+	LogPath string
+
+	// LogLevel indicates the logging level inside client, it should be used along with LogPath.
+	LogLevel zapcore.Level
 
 	// Logger is the customized logger for logging info, if it is not set,
 	// then gnet will use the default logger powered by go.uber.org/zap.
@@ -192,6 +204,20 @@ func WithTicker(ticker bool) Option {
 func WithCodec(codec ICodec) Option {
 	return func(opts *Options) {
 		opts.Codec = codec
+	}
+}
+
+// WithLogPath is an option to set up the local path of log file.
+func WithLogPath(fileName string) Option {
+	return func(opts *Options) {
+		opts.LogPath = fileName
+	}
+}
+
+// WithLogLevel is an option to set up the logging level.
+func WithLogLevel(lvl zapcore.Level) Option {
+	return func(opts *Options) {
+		opts.LogLevel = lvl
 	}
 }
 

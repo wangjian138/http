@@ -24,14 +24,13 @@ package gnet
 import (
 	"context"
 	"net"
-	"runtime"
 	"strings"
 	"sync"
 	"time"
 
 	"learn/http/gnet/errors"
 	"learn/http/gnet/internal"
-	"learn/http/gnet/internal/logging"
+	"learn/http/gnet/logging"
 )
 
 // Action is an action that occurs after the completion of an event.
@@ -86,9 +85,9 @@ func (s Server) CountConnections() (count int) {
 // It is the caller's responsibility to close dupFD when finished.
 // Closing listener does not affect dupFD, and closing dupFD does not affect listener.
 func (s Server) DupFd() (dupFD int, err error) {
-	dupFD, sc, err := s.svr.ln.Dup()
+	dupFD, sc, err := s.svr.ln.dup()
 	if err != nil {
-		logging.DefaultLogger.Warnf("%s failed when duplicating new fd\n", sc)
+		logging.Warnf("%s failed when duplicating new fd\n", sc)
 	}
 	return
 }
@@ -249,21 +248,39 @@ func (es *EventServer) Tick() (delay time.Duration, action Action) {
 func Serve(eventHandler EventHandler, protoAddr string, opts ...Option) (err error) {
 	options := loadOptions(opts...)
 
-	if options.Logger != nil {
-		logging.DefaultLogger = options.Logger
+	logging.Debugf("default logging level is %s", logging.LogLevel())
+
+	var (
+		logger logging.Logger
+		flush  func() error
+	)
+	if options.LogPath != "" {
+		if logger, flush, err = logging.CreateLoggerAsLocalFile(options.LogPath, options.LogLevel); err != nil {
+			return
+		}
+	} else {
+		logger = logging.GetDefaultLogger()
 	}
-	defer logging.Cleanup()
+	if options.Logger == nil {
+		options.Logger = logger
+	}
+	defer func() {
+		if flush != nil {
+			_ = flush()
+		}
+		logging.Cleanup()
+	}()
 
 	// The maximum number of operating system threads that the Go program can use is initially set to 10000,
-	// which should be the maximum amount of I/O event-loops locked to OS threads users can start up.
+	// which should also be the maximum amount of I/O event-loops locked to OS threads that users can start up.
 	if options.LockOSThread && options.NumEventLoop > 10000 {
-		logging.DefaultLogger.Errorf("too many event-loops under LockOSThread mode, should be less than 10,000 "+
+		logging.Errorf("too many event-loops under LockOSThread mode, should be less than 10,000 "+
 			"while you are trying to set up %d\n", options.NumEventLoop)
 		return errors.ErrTooManyEventLoopThreads
 	}
 
 	if rbc := options.ReadBufferCap; rbc <= 0 {
-		options.ReadBufferCap = 0x4000
+		options.ReadBufferCap = 0x10000
 	} else {
 		options.ReadBufferCap = internal.CeilToPowerOfTwo(rbc)
 	}
@@ -326,27 +343,3 @@ func parseProtoAddr(addr string) (network, address string) {
 	}
 	return
 }
-
-func sniffErrorAndLog(err error) {
-	if err != nil {
-		logging.DefaultLogger.Errorf(err.Error())
-	}
-}
-
-// channelBuffer determines whether the channel should be a buffered channel to get the best performance.
-var channelBuffer = func() int {
-	// Use blocking channel if GOMAXPROCS=1.
-	// This switches context from sender to receiver immediately,
-	// which results in higher performance.
-	var n int
-	if n = runtime.GOMAXPROCS(0); n == 1 {
-		return 0
-	}
-
-	// Make channel non-blocking and set up its capacity with GOMAXPROCS if GOMAXPROCS>1,
-	// otherwise the sender might be dragged down if the receiver is CPU-bound.
-	//
-	// GOMAXPROCS determines how many goroutines can run in parallel,
-	// which makes it the best choice as the channel capacity,
-	return n
-}()

@@ -22,14 +22,15 @@
 package gnet
 
 import (
+	"context"
 	"runtime"
 	"sync/atomic"
 	"time"
 	"unsafe"
 
-	"learn/http/gnet/pool/bytebuffer"
-
 	"learn/http/gnet/errors"
+	"learn/http/gnet/logging"
+	"learn/http/gnet/pool/bytebuffer"
 )
 
 type eventloop struct {
@@ -48,6 +49,10 @@ type internalEventloop struct {
 	connCount    int32                 // number of active connections in event-loop
 	connections  map[*stdConn]struct{} // track all the sockets bound to this loop
 	eventHandler EventHandler          // user eventHandler
+}
+
+func (el *eventloop) getLogger() logging.Logger {
+	return el.svr.opts.Logger
 }
 
 func (el *eventloop) addConn(delta int32) {
@@ -72,29 +77,36 @@ func (el *eventloop) loopRun(lockOSThread bool) {
 		el.svr.loopWG.Done()
 	}()
 
-	for v := range el.ch {
-		switch v := v.(type) {
+	for i := range el.ch {
+		switch v := i.(type) {
 		case error:
 			err = v
 		case *stdConn:
 			err = el.loopAccept(v)
 		case *tcpConn:
+			if v.c.conn == nil {
+				err = errors.ErrConnectionClosed
+				break
+			}
 			v.c.buffer = v.bb
 			err = el.loopRead(v.c)
 		case *udpConn:
 			err = el.loopReadUDP(v.c)
 		case *stderr:
 			err = el.loopError(v.c, v.err)
-		case wakeReq:
-			err = el.loopWake(v.c)
-		case func() error:
-			err = v()
+		case *signalTask:
+			err = v.run(v.c)
+			signalTaskPool.Put(i)
+		case *dataTask:
+			_, err = v.run(v.buf)
+			dataTaskPool.Put(i)
 		}
 
 		if err == errors.ErrServerShutdown {
+			el.getLogger().Debugf("event-loop(%d) is exiting in terms of the demand from user, %v", el.idx, err)
 			break
 		} else if err != nil {
-			el.svr.logger.Infof("Event-loop(%d) is exiting due to the error: %v", el.idx, err)
+			el.getLogger().Debugf("event-loop(%d) got a nonlethal error: %v", el.idx, err)
 		}
 	}
 }
@@ -164,24 +176,36 @@ func (el *eventloop) loopEgress() {
 	}
 }
 
-func (el *eventloop) loopTicker() {
+func (el *eventloop) loopTicker(ctx context.Context) {
+	if el == nil {
+		return
+	}
 	var (
-		delay time.Duration
-		open  bool
+		action Action
+		delay  time.Duration
+		timer  *time.Timer
 	)
-	for {
-		el.ch <- func() (err error) {
-			delay, action := el.eventHandler.Tick()
-			el.svr.ticktock <- delay
-			if action == Shutdown {
-				err = errors.ErrServerShutdown
-			}
-			return
+	defer func() {
+		if timer != nil {
+			timer.Stop()
 		}
-		if delay, open = <-el.svr.ticktock; open {
-			time.Sleep(delay)
+	}()
+	for {
+		delay, action = el.eventHandler.Tick()
+		if action == Shutdown {
+			el.ch <- errors.ErrServerShutdown
+			el.getLogger().Debugf("stopping ticker in event-loop(%d) from Tick()", el.idx)
+		}
+		if timer == nil {
+			timer = time.NewTimer(delay)
 		} else {
-			break
+			timer.Reset(delay)
+		}
+		select {
+		case <-ctx.Done():
+			el.getLogger().Debugf("stopping ticker in event-loop(%d) from Server, error:%v", el.idx, ctx.Err())
+			return
+		case <-timer.C:
 		}
 	}
 }
@@ -193,7 +217,7 @@ func (el *eventloop) loopError(c *stdConn, err error) (e error) {
 		}
 
 		if err = c.conn.Close(); err != nil {
-			el.svr.logger.Warnf("Failed to close connection(%s), error: %v", c.remoteAddr.String(), err)
+			el.getLogger().Errorf("failed to close connection(%s), error: %v", c.remoteAddr.String(), err)
 			if e == nil {
 				e = err
 			}

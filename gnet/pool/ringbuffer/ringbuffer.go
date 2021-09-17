@@ -20,7 +20,7 @@
 // SOFTWARE.
 //
 // Use of this source code is governed by a MIT license that can be found
-// at https://learn/http/bytebufferpool/blob/master/LICENSE
+// at https://github.com/valyala/bytebufferpool/blob/master/LICENSE
 
 package ringbuffer
 
@@ -37,7 +37,6 @@ const (
 	steps      = 20
 
 	minSize = 1 << minBitSize
-	// maxSize = 1 << (minBitSize + steps - 1)
 
 	calibrateCallsThreshold = 42000
 	maxPercentile           = 0.95

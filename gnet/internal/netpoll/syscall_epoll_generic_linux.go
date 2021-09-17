@@ -1,4 +1,4 @@
-// Copyright (c) 2019 Andy Pan
+// Copyright (c) 2021 Andy Pan
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -18,20 +18,35 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package bytebuffer
+// +build linux,!arm64,!riscv64
+// +build poll_opt
 
-import "github.com/valyala/bytebufferpool"
+package netpoll
 
-// ByteBuffer is the alias of bytebufferpool.ByteBuffer.
-type ByteBuffer = bytebufferpool.ByteBuffer
+import (
+	"unsafe"
 
-var (
-	// Get returns an empty byte buffer from the pool, exported from gnet/bytebuffer.
-	Get = bytebufferpool.Get
-	// Put returns byte buffer to the pool, exported from gnet/bytebuffer.
-	Put = func(b *ByteBuffer) {
-		if b != nil {
-			bytebufferpool.Put(b)
-		}
-	}
+	"golang.org/x/sys/unix"
 )
+
+func epollWait(epfd int, events []epollevent, msec int) (int, error) {
+	var ep unsafe.Pointer
+	if len(events) > 0 {
+		ep = unsafe.Pointer(&events[0])
+	} else {
+		ep = unsafe.Pointer(&zero)
+	}
+	var (
+		np    uintptr
+		errno unix.Errno
+	)
+	if msec == 0 { // non-block system call, use RawSyscall6 to avoid getting preempted by runtime
+		np, _, errno = unix.RawSyscall6(unix.SYS_EPOLL_WAIT, uintptr(epfd), uintptr(ep), uintptr(len(events)), 0, 0, 0)
+	} else {
+		np, _, errno = unix.Syscall6(unix.SYS_EPOLL_WAIT, uintptr(epfd), uintptr(ep), uintptr(len(events)), uintptr(msec), 0, 0)
+	}
+	if errno != 0 {
+		return int(np), errnoErr(errno)
+	}
+	return int(np), nil
+}

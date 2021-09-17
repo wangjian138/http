@@ -27,6 +27,7 @@ import (
 
 	"learn/http/gnet/errors"
 	"learn/http/gnet/internal/netpoll"
+	"learn/http/gnet/logging"
 )
 
 type listener struct {
@@ -37,14 +38,14 @@ type listener struct {
 	addr, network string
 }
 
-func (ln *listener) Dup() (int, string, error) {
+func (ln *listener) dup() (int, string, error) {
 	return netpoll.Dup(0)
 }
 
 func (ln *listener) normalize() (err error) {
 	switch ln.network {
 	case "unix":
-		sniffErrorAndLog(os.RemoveAll(ln.addr))
+		logging.LogErr(os.RemoveAll(ln.addr))
 		fallthrough
 	case "tcp", "tcp4", "tcp6":
 		if ln.ln, err = net.Listen(ln.network, ln.addr); err != nil {
@@ -65,13 +66,13 @@ func (ln *listener) normalize() (err error) {
 func (ln *listener) close() {
 	ln.once.Do(func() {
 		if ln.ln != nil {
-			sniffErrorAndLog(ln.ln.Close())
+			logging.LogErr(ln.ln.Close())
 		}
 		if ln.pconn != nil {
-			sniffErrorAndLog(ln.pconn.Close())
+			logging.LogErr(ln.pconn.Close())
 		}
 		if ln.network == "unix" {
-			sniffErrorAndLog(os.RemoveAll(ln.addr))
+			logging.LogErr(os.RemoveAll(ln.addr))
 		}
 	})
 }

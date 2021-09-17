@@ -26,7 +26,10 @@ import (
 	"learn/http/gnet/pool/bytebuffer"
 )
 
-const initSize = 1 << 12 // 4096 bytes for the first-time allocation on ring-buffer.
+const (
+	defaultBufferSize   = 1024     // 1KB for the first-time allocation on ring-buffer.
+	bufferGrowThreshold = 4 * 1024 // 4KB
+)
 
 // ErrIsEmpty will be returned when trying to read a empty ring-buffer.
 var ErrIsEmpty = errors.New("ring-buffer is empty")
@@ -35,7 +38,6 @@ var ErrIsEmpty = errors.New("ring-buffer is empty")
 type RingBuffer struct {
 	buf     []byte
 	size    int
-	mask    int
 	r       int // next position to read
 	w       int // next position to write
 	isEmpty bool
@@ -53,49 +55,48 @@ func New(size int) *RingBuffer {
 	return &RingBuffer{
 		buf:     make([]byte, size),
 		size:    size,
-		mask:    size - 1,
 		isEmpty: true,
 	}
 }
 
-// LazyRead reads the bytes with given length but will not move the pointer of "read".
-func (r *RingBuffer) LazyRead(len int) (head []byte, tail []byte) {
+// Peek returns the next n bytes without advancing the read pointer.
+func (r *RingBuffer) Peek(n int) (head []byte, tail []byte) {
 	if r.isEmpty {
 		return
 	}
 
-	if len <= 0 {
+	if n <= 0 {
 		return
 	}
 
 	if r.w > r.r {
-		n := r.w - r.r // Length
-		if n > len {
-			n = len
+		m := r.w - r.r // length of ring-buffer
+		if m > n {
+			m = n
 		}
-		head = r.buf[r.r : r.r+n]
+		head = r.buf[r.r : r.r+m]
 		return
 	}
 
-	n := r.size - r.r + r.w // Length
-	if n > len {
-		n = len
+	m := r.size - r.r + r.w // length of ring-buffer
+	if m > n {
+		m = n
 	}
 
-	if r.r+n <= r.size {
-		head = r.buf[r.r : r.r+n]
+	if r.r+m <= r.size {
+		head = r.buf[r.r : r.r+m]
 	} else {
 		c1 := r.size - r.r
 		head = r.buf[r.r:]
-		c2 := n - c1
+		c2 := m - c1
 		tail = r.buf[:c2]
 	}
 
 	return
 }
 
-// LazyReadAll reads the all bytes in this ring-buffer but will not move the pointer of "read".
-func (r *RingBuffer) LazyReadAll() (head []byte, tail []byte) {
+// PeekAll returns all bytes without advancing the read pointer.
+func (r *RingBuffer) PeekAll() (head []byte, tail []byte) {
 	if r.isEmpty {
 		return
 	}
@@ -113,14 +114,14 @@ func (r *RingBuffer) LazyReadAll() (head []byte, tail []byte) {
 	return
 }
 
-// Shift shifts the "read" pointer.
-func (r *RingBuffer) Shift(n int) {
+// Discard skips the next n bytes by advancing the read pointer.
+func (r *RingBuffer) Discard(n int) {
 	if n <= 0 {
 		return
 	}
 
 	if n < r.Length() {
-		r.r = (r.r + n) & r.mask
+		r.r = (r.r + n) % r.size
 	} else {
 		r.Reset()
 	}
@@ -172,12 +173,12 @@ func (r *RingBuffer) Read(p []byte) (n int, err error) {
 		c2 := n - c1
 		copy(p[c1:], r.buf[:c2])
 	}
-	r.r = (r.r + n) & r.mask
+	r.r = (r.r + n) % r.size
 	if r.r == r.w {
 		r.Reset()
 	}
 
-	return n, err
+	return
 }
 
 // ReadByte reads and returns the next byte from the input or ErrIsEmpty.
@@ -194,7 +195,7 @@ func (r *RingBuffer) ReadByte() (b byte, err error) {
 		r.Reset()
 	}
 
-	return b, err
+	return
 }
 
 // Write writes len(p) bytes from p to the underlying buf.
@@ -206,12 +207,12 @@ func (r *RingBuffer) ReadByte() (b byte, err error) {
 func (r *RingBuffer) Write(p []byte) (n int, err error) {
 	n = len(p)
 	if n == 0 {
-		return 0, nil
+		return
 	}
 
 	free := r.Free()
 	if n > free {
-		r.malloc(n - free)
+		r.grow(r.size + n - free)
 	}
 
 	if r.w >= r.r {
@@ -236,13 +237,13 @@ func (r *RingBuffer) Write(p []byte) (n int, err error) {
 
 	r.isEmpty = false
 
-	return n, err
+	return
 }
 
 // WriteByte writes one byte into buffer.
 func (r *RingBuffer) WriteByte(c byte) error {
 	if r.Free() < 1 {
-		r.malloc(1)
+		r.grow(1)
 	}
 	r.buf[r.w] = c
 	r.w++
@@ -298,7 +299,7 @@ func (r *RingBuffer) Free() int {
 }
 
 // WriteString writes the contents of the string s to buffer, which accepts a slice of bytes.
-func (r *RingBuffer) WriteString(s string) (n int, err error) {
+func (r *RingBuffer) WriteString(s string) (int, error) {
 	return r.Write(internal.StringToBytes(s))
 }
 
@@ -358,35 +359,45 @@ func (r *RingBuffer) WithByteBuffer(b []byte) *bytebuffer.ByteBuffer {
 	return bb
 }
 
-// IsFull returns this ringbuffer is full.
+// IsFull tells if this ring-buffer is full.
 func (r *RingBuffer) IsFull() bool {
 	return r.r == r.w && !r.isEmpty
 }
 
-// IsEmpty returns this ringbuffer is empty.
+// IsEmpty tells if this ring-buffer is empty.
 func (r *RingBuffer) IsEmpty() bool {
 	return r.isEmpty
 }
 
-// Reset the read pointer and writer pointer to zero.
+// Reset the read pointer and write pointer to zero.
 func (r *RingBuffer) Reset() {
 	r.isEmpty = true
 	r.r, r.w = 0, 0
-
-	// Shrink the internal buffer for saving memory.
-	newCap := r.size >> 1
-	newBuf := make([]byte, newCap)
-	r.buf = newBuf
-	r.size = newCap
-	r.mask = newCap - 1
 }
 
-func (r *RingBuffer) malloc(cap int) {
-	var newCap int
-	if r.size == 0 && cap < initSize {
-		newCap = initSize
+func (r *RingBuffer) grow(newCap int) {
+	if n := r.size; n == 0 {
+		if newCap <= defaultBufferSize {
+			newCap = defaultBufferSize
+		} else {
+			newCap = internal.CeilToPowerOfTwo(newCap)
+		}
 	} else {
-		newCap = internal.CeilToPowerOfTwo(r.size + cap)
+		doubleCap := n + n
+		if newCap <= doubleCap {
+			if n < bufferGrowThreshold {
+				newCap = doubleCap
+			} else {
+				// Check 0 < n to detect overflow and prevent an infinite loop.
+				for 0 < n && n < newCap {
+					n += n / 4
+				}
+				// The n calculation doesn't overflow, set n to newCap.
+				if n > 0 {
+					newCap = n
+				}
+			}
+		}
 	}
 	newBuf := make([]byte, newCap)
 	oldLen := r.Length()
@@ -395,5 +406,4 @@ func (r *RingBuffer) malloc(cap int) {
 	r.r = 0
 	r.w = oldLen
 	r.size = newCap
-	r.mask = newCap - 1
 }
