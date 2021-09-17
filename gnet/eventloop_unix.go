@@ -32,10 +32,11 @@ import (
 	"time"
 	"unsafe"
 
-	"golang.org/x/sys/unix"
 	gerrors "learn/http/gnet/errors"
 	"learn/http/gnet/internal/netpoll"
 	"learn/http/gnet/internal/socket"
+
+	"golang.org/x/sys/unix"
 )
 
 type eventloop struct {
@@ -163,7 +164,7 @@ func (el *eventloop) loopRead(c *conn) error {
 			return gerrors.ErrServerShutdown
 		}
 
-		// Check the status of connection every loop since it might be closed during writing data back to client due to
+		// AuthCheck the status of connection every loop since it might be closed during writing data back to client due to
 		// some kind of system error.
 		if !c.opened {
 			return nil

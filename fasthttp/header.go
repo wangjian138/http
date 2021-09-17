@@ -2340,7 +2340,7 @@ func normalizeHeaderValue(ov, ob []byte, headerLength int) (nv, nb []byte, nhl i
 	nv = nv[:write]
 	copy(ob[write:], ob[write+shrunk:])
 
-	// Check if we need to skip \r\n or just \n
+	// AuthCheck if we need to skip \r\n or just \n
 	skip := 0
 	if ob[write] == rChar {
 		if ob[write+1] == nChar {

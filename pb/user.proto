@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+option go_package="./;pb";
+package pb;
+
+message User {
+  string name = 1;   // 定义一个string类型的字段name, 序号为1
+  int32 age = 2;   // 定义一个int32类型的字段age, 序号为2
+}
