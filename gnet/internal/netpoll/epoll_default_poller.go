@@ -98,6 +98,7 @@ func (p *Poller) UrgentTrigger(fn queue.TaskFunc, arg interface{}) (err error) {
 	task.Run, task.Arg = fn, arg
 	p.priorAsyncTaskQueue.Enqueue(task)
 	if atomic.CompareAndSwapInt32(&p.netpollWakeSig, 0, 1) {
+		fmt.Printf("UrgentTrigger p.wfd:%v b:%v\n", p.wfd, b)
 		for _, err = unix.Write(p.wfd, b); err == unix.EINTR || err == unix.EAGAIN; _, err = unix.Write(p.wfd, b) {
 		}
 	}
