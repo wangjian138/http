@@ -89,6 +89,7 @@ func initListener(network, addr string, options *Options) (l *listener, err erro
 		sockopt := socket.Option{SetSockopt: socket.SetReuseport, Opt: 1}
 		sockopts = append(sockopts, sockopt)
 	}
+
 	if options.TCPNoDelay == TCPNoDelay && strings.HasPrefix(network, "tcp") {
 		sockopt := socket.Option{SetSockopt: socket.SetNoDelay, Opt: 1}
 		sockopts = append(sockopts, sockopt)

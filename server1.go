@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func index(w http.ResponseWriter, r *http.Request) {
+func index1(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
 
 	html := `<doctype html>
@@ -26,7 +26,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 func main() {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/", index)
+	mux.HandleFunc("/", index1)
 
 	server := &http.Server{
 		Addr:         ":8010",

@@ -3,12 +3,13 @@ package main
 import (
 	"flag"
 	"fmt"
-	"learn/http/gnet"
 	"log"
 	"strconv"
 	"strings"
 	"time"
 	"unsafe"
+
+	"learn/http/gnet"
 )
 
 var res string
@@ -57,15 +58,14 @@ pipeline:
 		return
 	}
 	out = appendHandle(out, res)
-	fmt.Printf("out:%v\n", string(out))
 
 	buf = leftover
 	goto pipeline
 }
 
 func (hs *httpServer) OnInitComplete(srv gnet.Server) (action gnet.Action) {
-	log.Printf("HTTP server is listening on %s (multi-cores: %t, loops: %d)\n",
-		srv.Addr.String(), srv.Multicore, srv.NumEventLoop)
+	//log.Printf("HTTP server is listening on %s (multi-cores: %t, loops: %d)\n",
+	//	srv.Addr.String(), srv.Multicore, srv.NumEventLoop)
 	return
 }
 
@@ -96,7 +96,7 @@ func main() {
 	hc := new(httpCodec)
 
 	// Start serving!
-	log.Fatal(gnet.Serve(http, fmt.Sprintf("tcp://:%d", port), gnet.WithMulticore(multicore), gnet.WithCodec(hc)))
+	log.Fatal(gnet.Serve(http, fmt.Sprintf("tcp://:%d", port), gnet.WithMulticore(multicore), gnet.WithCodec(hc), gnet.WithNumEventLoop(3)))
 }
 
 // appendHandle handles the incoming request and appends the response to
