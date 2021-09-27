@@ -140,6 +140,8 @@ func (p *Poller) Polling(callback func(fd int, ev uint32) error) error {
 
 		for i := 0; i < n; i++ {
 			ev := &el.events[i]
+			fmt.Printf("Polling i:%v ev.Fd:%v p.wfd:%v\n", i, ev.Fd, p.wfd)
+
 			if fd := int(ev.Fd); fd != p.wfd {
 				switch err = callback(fd, ev.Events); err {
 				case nil:
