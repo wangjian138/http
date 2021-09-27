@@ -25,7 +25,6 @@ package gnet
 
 import (
 	"context"
-	"fmt"
 	"runtime"
 	"sync"
 	"sync/atomic"
@@ -91,8 +90,6 @@ func (svr *server) startSubReactors() {
 	svr.lb.iterate(func(i int, el *eventloop) bool {
 		svr.wg.Add(1)
 		go func() {
-			fmt.Printf("lockOSThread:%v\n", svr.opts.LockOSThread)
-
 			el.activateSubReactor(svr.opts.LockOSThread)
 			svr.wg.Done()
 		}()
