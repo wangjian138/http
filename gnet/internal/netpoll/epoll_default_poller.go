@@ -127,7 +127,6 @@ func (p *Poller) Polling(callback func(fd int, ev uint32) error) error {
 	msec := -1
 	for {
 		n, err := unix.EpollWait(p.fd, el.events, msec)
-		fmt.Printf("Polling n:%v err:%v\n", n, err)
 		if n == 0 || (n < 0 && err == unix.EINTR) {
 			msec = -1
 			runtime.Gosched()

@@ -23,7 +23,6 @@
 package gnet
 
 import (
-	"fmt"
 	"runtime"
 
 	"learn/http/gnet/errors"
@@ -47,7 +46,6 @@ func (el *eventloop) activateMainReactor(lockOSThread bool) {
 }
 
 func (el *eventloop) activateSubReactor(lockOSThread bool) {
-	fmt.Printf("lockOSThread1:%v\n", lockOSThread)
 	if lockOSThread {
 		runtime.LockOSThread()
 		defer runtime.UnlockOSThread()
