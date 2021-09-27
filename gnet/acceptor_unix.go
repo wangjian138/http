@@ -23,6 +23,7 @@
 package gnet
 
 import (
+	"fmt"
 	"os"
 	"time"
 
@@ -36,6 +37,7 @@ import (
 
 func (svr *server) acceptNewConnection(_ netpoll.IOEvent) error {
 	nfd, sa, err := unix.Accept(svr.ln.fd)
+	fmt.Printf("acceptNewConnection svr.ln.fd:%v nfd:%v\n", svr.ln.fd, nfd)
 	if err != nil {
 		if err == unix.EAGAIN {
 			return nil
