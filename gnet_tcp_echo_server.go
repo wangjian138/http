@@ -7,17 +7,17 @@ import (
 	"log"
 )
 
-type echoServer struct {
+type echoServer1 struct {
 	*gnet.EventServer
 }
 
-func (es *echoServer) OnInitComplete(srv gnet.Server) (action gnet.Action) {
+func (es *echoServer1) OnInitComplete(srv gnet.Server) (action gnet.Action) {
 	log.Printf("Echo server is listening on %s (multi-cores: %t, loops: %d)\n",
 		srv.Addr.String(), srv.Multicore, srv.NumEventLoop)
 	return
 }
 
-func (es *echoServer) React(frame []byte, c gnet.Conn) (out []byte, action gnet.Action) {
+func (es *echoServer1) React(frame []byte, c gnet.Conn) (out []byte, action gnet.Action) {
 	out = frame
 	return
 }

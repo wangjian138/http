@@ -86,7 +86,7 @@ func main() {
 	var multicore bool
 
 	// Example command: go run http.go --port 8080 --multicore=true
-	flag.IntVar(&port, "port", 4443, "server port")
+	flag.IntVar(&port, "port", 8888, "server port")
 	flag.BoolVar(&multicore, "multicore", true, "multicore")
 	flag.Parse()
 
@@ -96,7 +96,7 @@ func main() {
 	hc := new(httpCodec)
 
 	// Start serving!
-	log.Fatal(gnet.Serve(http, fmt.Sprintf("tcp://:%d", port), gnet.WithMulticore(multicore), gnet.WithCodec(hc), gnet.WithNumEventLoop(3)))
+	log.Fatal(gnet.Serve(http, fmt.Sprintf("tcp://:%d", port), gnet.WithMulticore(multicore), gnet.WithCodec(hc), gnet.WithNumEventLoop(3), gnet.WithReusePort(true)))
 }
 
 // appendHandle handles the incoming request and appends the response to

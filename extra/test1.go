@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"runtime/debug"
 	"time"
 )
 
@@ -15,4 +16,6 @@ func main() {
 
 	permNum := rand.Perm(7)
 	fmt.Printf("permNum:%v\n", permNum)
+	//debug.SetMemoryLimit()
+	debug.SetGCPercent(1)
 }

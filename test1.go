@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net"
+	"syscall"
 )
 
 func main() {
@@ -11,6 +12,7 @@ func main() {
 		fmt.Println("listen error: ", err)
 		return
 	}
+	fmt.Printf("syscall AF_INET6:%v AF_INET:%v\n", syscall.AF_INET6, syscall.AF_INET)
 
 	for {
 		conn, err := listen.Accept()

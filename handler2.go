@@ -102,5 +102,6 @@ func main() {
 	mux.HandleFunc("/text", text)
 	mux.HandleFunc("/getLru", getLru)
 	mux.HandleFunc("/setLru", setLru)
+	mux.HandleFunc("//setLru", setLru)
 	http.ListenAndServe(":8090", mux)
 }
