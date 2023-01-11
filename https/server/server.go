@@ -46,7 +46,7 @@ func main() {
 	mux.Handle("/text", thWelcome)
 
 	//http.ListenAndServe(":8084", mux)
-	err := http.ListenAndServeTLS(":8084", fmt.Sprintf("%s/%s", dir, "server.crt"), fmt.Sprintf("%s/%s", dir, "server_rsa_private.pem"), mux)
+	err := http.ListenAndServeTLS(":8084", fmt.Sprintf("%s/%s", dir, "server.crt"), fmt.Sprintf("%s/%s", dir, "server_rsa_private.pem.unsecure"), mux)
 	fmt.Printf("err:%v\n", err)
 }
 
