@@ -7,10 +7,10 @@ package http_test
 import (
 	"bufio"
 	"bytes"
-	"crypto/tls"
 	"crypto/x509"
 	"fmt"
 	"io"
+	"learn/http/go/crypto/tls"
 	. "net/http"
 	"net/http/httptest"
 	"strings"

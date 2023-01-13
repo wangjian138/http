@@ -8,11 +8,11 @@ package http
 
 import (
 	"bytes"
-	"crypto/tls"
 	"errors"
 	"fmt"
 	"io"
 	"learn/http/go/bufio"
+	"learn/http/go/crypto/tls"
 	"learn/http/go/net/textproto"
 	"net/url"
 	"strconv"

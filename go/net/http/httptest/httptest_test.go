@@ -5,8 +5,8 @@
 package httptest
 
 import (
-	"crypto/tls"
 	"io"
+	"learn/http/go/crypto/tls"
 	"net/http"
 	"net/url"
 	"reflect"

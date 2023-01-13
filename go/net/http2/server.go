@@ -4,7 +4,7 @@
 
 // TODO: turn off the serve goroutine when idle, so
 // an idle conn only has the readFrames goroutine active. (which could
-// also be optimized probably to pin less memory in crypto/tls). This
+// also be optimized probably to pin less memory in learn/http/go/crypto/tls). This
 // would involve tracking when the serve goroutine is active (atomic
 // int32 read/CAS probably?) and starting it up when frames arrive,
 // and shutting it down when all handlers exit. the occasional PING
@@ -29,10 +29,10 @@ import (
 	"bufio"
 	"bytes"
 	"context"
-	"crypto/tls"
 	"errors"
 	"fmt"
 	"io"
+	"learn/http/go/crypto/tls"
 	"log"
 	"math"
 	"net"
@@ -1373,7 +1373,7 @@ func (sc *serverConn) processFrameFromReader(res readFrameResult) bool {
 			// (e.g. CloseWrite) because they're done
 			// sending frames but they're still wanting
 			// our open replies?  Investigate.
-			// TODO: add CloseWrite to crypto/tls.Conn first
+			// TODO: add CloseWrite to learn/http/go/crypto/tls.Conn first
 			// so we have a way to test this? I suppose
 			// just for testing we could have a non-TLS mode.
 			return false

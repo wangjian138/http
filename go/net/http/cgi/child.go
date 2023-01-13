@@ -9,10 +9,10 @@ package cgi
 
 import (
 	"bufio"
-	"crypto/tls"
 	"errors"
 	"fmt"
 	"io"
+	"learn/http/go/crypto/tls"
 	"net"
 	"net/http"
 	"net/url"

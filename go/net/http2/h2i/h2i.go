@@ -24,11 +24,11 @@ package main
 import (
 	"bufio"
 	"bytes"
-	"crypto/tls"
 	"errors"
 	"flag"
 	"fmt"
 	"io"
+	"learn/http/go/crypto/tls"
 	"log"
 	"net"
 	"net/http"

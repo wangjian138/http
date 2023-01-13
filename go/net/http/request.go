@@ -9,12 +9,12 @@ package http
 import (
 	"bytes"
 	"context"
-	"crypto/tls"
 	"encoding/base64"
 	"errors"
 	"fmt"
 	"io"
 	"learn/http/go/bufio"
+	"learn/http/go/crypto/tls"
 	"learn/http/go/net/textproto"
 	"mime"
 	"mime/multipart"

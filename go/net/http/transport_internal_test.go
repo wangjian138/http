@@ -8,9 +8,9 @@ package http
 
 import (
 	"bytes"
-	"crypto/tls"
 	"errors"
 	"io"
+	"learn/http/go/crypto/tls"
 	"net"
 	"net/http/internal"
 	"strings"

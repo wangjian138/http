@@ -9,11 +9,11 @@ package http_test
 import (
 	"bytes"
 	"context"
-	"crypto/tls"
 	"encoding/base64"
 	"errors"
 	"fmt"
 	"io"
+	"learn/http/go/crypto/tls"
 	"log"
 	"net"
 	. "net/http"

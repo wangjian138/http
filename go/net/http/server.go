@@ -9,9 +9,9 @@ package http
 import (
 	"bytes"
 	"context"
-	"crypto/tls"
 	"errors"
 	"fmt"
+	"learn/http/go/crypto/tls"
 
 	"io"
 	"learn/http/go/bufio"

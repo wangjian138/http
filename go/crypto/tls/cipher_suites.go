@@ -10,13 +10,13 @@ import (
 	"crypto/cipher"
 	"crypto/des"
 	"crypto/hmac"
-	"crypto/internal/boring"
 	"crypto/rc4"
 	"crypto/sha1"
 	"crypto/sha256"
 	"fmt"
 	"hash"
-	"internal/cpu"
+	"learn/http/go/crypto/internal/boring"
+	"learn/http/go/internal/cpu"
 	"runtime"
 
 	"golang.org/x/crypto/chacha20poly1305"
@@ -425,9 +425,9 @@ func macSHA1(key []byte) hash.Hash {
 	h := sha1.New
 	// The BoringCrypto SHA1 does not have a constant-time
 	// checksum function, so don't try to use it.
-	if !boring.Enabled {
-		h = newConstantTimeHash(h)
-	}
+	//if !boring.Enabled {
+	//	h = newConstantTimeHash(h)
+	//}
 	return hmac.New(h, key)
 }
 

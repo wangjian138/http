@@ -12,11 +12,11 @@ import (
 	"compress/gzip"
 	"context"
 	"crypto/rand"
-	"crypto/tls"
 	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
+	"learn/http/go/crypto/tls"
 	"log"
 	"math"
 	mathrand "math/rand"
@@ -679,7 +679,7 @@ func (t *Transport) newClientConn(c net.Conn, singleUse bool) (*ClientConn, erro
 	cc.flow.add(int32(initialWindowSize))
 
 	// TODO: adjust this writer size to account for frame size +
-	// MTU + crypto/tls record padding.
+	// MTU + learn/http/go/crypto/tls record padding.
 	cc.bw = bufio.NewWriter(stickyErrWriter{
 		conn:    c,
 		timeout: t.WriteByteTimeout,

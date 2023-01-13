@@ -9,7 +9,7 @@ package http2
 
 import (
 	"context"
-	"crypto/tls"
+	"learn/http/go/crypto/tls"
 )
 
 // dialTLSWithContext opens a TLS connection.

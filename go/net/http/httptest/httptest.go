@@ -8,8 +8,8 @@ package httptest
 import (
 	"bufio"
 	"bytes"
-	"crypto/tls"
 	"io"
+	"learn/http/go/crypto/tls"
 	"net/http"
 	"strings"
 )

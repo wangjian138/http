@@ -8,7 +8,7 @@ package httptrace
 
 import (
 	"context"
-	"crypto/tls"
+	"learn/http/go/crypto/tls"
 	"learn/http/go/net/textproto"
 	"learn/http/go/nettrace"
 	"net"

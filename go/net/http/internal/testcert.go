@@ -8,7 +8,7 @@ import "strings"
 
 // LocalhostCert is a PEM-encoded TLS cert with SAN IPs
 // "127.0.0.1" and "[::1]", expiring at Jan 29 16:00:00 2084 GMT.
-// generated from src/crypto/tls:
+// generated from src/learn/http/go/crypto/tls:
 // go run generate_cert.go  --rsa-bits 1024 --host 127.0.0.1,::1,example.com --ca --start-date "Jan 1 00:00:00 1970" --duration=1000000h
 var LocalhostCert = []byte(`-----BEGIN CERTIFICATE-----
 MIICEzCCAXygAwIBAgIQMIMChMLGrR+QvmQvpwAU6zANBgkqhkiG9w0BAQsFADAS

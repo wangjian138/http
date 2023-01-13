@@ -17,9 +17,9 @@ package http2 // import "golang.org/x/net/http2"
 
 import (
 	"bufio"
-	"crypto/tls"
 	"fmt"
 	"io"
+	"learn/http/go/crypto/tls"
 	"net/http"
 	"os"
 	"sort"
