@@ -17,11 +17,12 @@ import (
 	"io"
 	"io/ioutil"
 	"learn/http/go/crypto/tls"
+	"learn/http/go/net/http"
 	"log"
 	"math"
 	mathrand "math/rand"
 	"net"
-	"net/http"
+
 	"net/http/httptrace"
 	"net/textproto"
 	"os"

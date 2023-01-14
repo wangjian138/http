@@ -7,8 +7,8 @@ package http2
 import (
 	"bytes"
 	"fmt"
+	"learn/http/go/net/http"
 	"log"
-	"net/http"
 	"net/url"
 
 	"golang.org/x/net/http/httpguts"

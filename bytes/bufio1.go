@@ -3,7 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"myhttp/go/bufio"
+	"learn/http/go/bufio"
 )
 
 func main2() {

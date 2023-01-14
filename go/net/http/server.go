@@ -804,9 +804,7 @@ func (cr *connReader) Read(p []byte) (n int, err error) {
 	}
 	cr.inRead = true
 	cr.unlock()
-	fmt.Printf("connReader read\n")
 	n, err = cr.conn.rwc.Read(p)
-	fmt.Printf("connReader readend\n")
 
 	cr.lock()
 	cr.inRead = false
@@ -816,7 +814,6 @@ func (cr *connReader) Read(p []byte) (n int, err error) {
 	cr.remain -= int64(n)
 	cr.unlock()
 
-	fmt.Printf("connReader cr.cond.Broadcast()\n")
 	cr.cond.Broadcast()
 	return n, err
 }
@@ -1862,6 +1859,7 @@ func (c *conn) serve(ctx context.Context) {
 		}
 		c.tlsState = new(tls.ConnectionState)
 		*c.tlsState = tlsConn.ConnectionState()
+
 		if proto := c.tlsState.NegotiatedProtocol; validNextProto(proto) {
 			if fn := c.server.TLSNextProto[proto]; fn != nil {
 				h := initALPNRequest{ctx, tlsConn, serverHandler{c.server}}
@@ -1872,6 +1870,8 @@ func (c *conn) serve(ctx context.Context) {
 				fn(c.server, tlsConn, h)
 			}
 			return
+		} else {
+			fmt.Printf("proto1:%v\n", proto)
 		}
 	}
 
