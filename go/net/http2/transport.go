@@ -697,7 +697,6 @@ func (t *Transport) newClientConn(c net.Conn, singleUse bool) (*ClientConn, erro
 	// TODO: SetMaxDynamicTableSize, SetMaxDynamicTableSizeLimit on
 	// henc in response to SETTINGS frames?
 	cc.henc = hpack.NewEncoder(&cc.hbuf)
-
 	if t.AllowHTTP {
 		cc.nextStreamID = 3
 	}
@@ -2154,10 +2153,13 @@ func (rl *clientConnReadLoop) run() error {
 
 		switch f := f.(type) {
 		case *MetaHeadersFrame:
+			fmt.Printf("MetaHeadersFrame stream:%v\n", f.StreamID)
 			err = rl.processHeaders(f)
 		case *DataFrame:
+			fmt.Printf("DataFrame stream:%v\n", f.StreamID)
 			err = rl.processData(f)
 		case *GoAwayFrame:
+			fmt.Printf("GoAwayFrame stream:%v\n", f.StreamID)
 			err = rl.processGoAway(f)
 		case *RSTStreamFrame:
 			err = rl.processResetStream(f)
@@ -2212,7 +2214,6 @@ func (rl *clientConnReadLoop) processHeaders(f *MetaHeadersFrame) error {
 	} else {
 		return rl.processTrailers(cs, f)
 	}
-
 	res, err := rl.handleResponse(cs, f)
 	if err != nil {
 		if _, ok := err.(ConnectionError); ok {
@@ -2608,7 +2609,6 @@ func (rl *clientConnReadLoop) processData(f *DataFrame) error {
 			return nil
 		}
 	}
-
 	if f.StreamEnded() {
 		rl.endStream(cs)
 	}

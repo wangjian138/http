@@ -1870,8 +1870,6 @@ func (c *conn) serve(ctx context.Context) {
 				fn(c.server, tlsConn, h)
 			}
 			return
-		} else {
-			fmt.Printf("proto1:%v\n", proto)
 		}
 	}
 

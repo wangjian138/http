@@ -7,21 +7,21 @@ import (
 	"log"
 )
 
-type echoServer struct {
-	*gnet.EventServer
-}
-
-func (es *echoServer) OnInitComplete(srv gnet.Server) (action gnet.Action) {
-	log.Printf("UDP Echo server is listening on %s (multi-cores: %t, loops: %d)\n",
-		srv.Addr.String(), srv.Multicore, srv.NumEventLoop)
-	return
-}
-
-func (es *echoServer) React(frame []byte, c gnet.Conn) (out []byte, action gnet.Action) {
-	// Echo synchronously.
-	out = frame
-	return
-}
+//type echoServer struct {
+//	*gnet.EventServer
+//}
+//
+//func (es *echoServer) OnInitComplete(srv gnet.Server) (action gnet.Action) {
+//	log.Printf("UDP Echo server is listening on %s (multi-cores: %t, loops: %d)\n",
+//		srv.Addr.String(), srv.Multicore, srv.NumEventLoop)
+//	return
+//}
+//
+//func (es *echoServer) React(frame []byte, c gnet.Conn) (out []byte, action gnet.Action) {
+//	// Echo synchronously.
+//	out = frame
+//	return
+//}
 
 func main() {
 	var port int

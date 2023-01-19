@@ -4733,10 +4733,13 @@ func (sc *http2serverConn) startFrameWrite(wr http2FrameWriteRequest) {
 	sc.writingFrame = true
 	sc.needsFrameFlush = true
 	if wr.write.staysWithinBuffer(sc.bw.Available()) {
+		//fmt.Println("staysWithinBuffer\n")
 		sc.writingFrameAsync = false
 		err := wr.write.writeFrame(sc)
 		sc.wroteFrame(http2frameWriteResult{wr: wr, err: err})
 	} else {
+		//fmt.Println("staysWithinBuffer else\n")
+
 		sc.writingFrameAsync = true
 		go sc.writeFrameAsync(wr)
 	}
@@ -4842,6 +4845,7 @@ func (sc *http2serverConn) scheduleFrameWrite() {
 				}
 				sc.startFrameWrite(wr)
 				continue
+			} else {
 			}
 		}
 		if sc.needsFrameFlush {
@@ -4978,12 +4982,16 @@ func (sc *http2serverConn) processFrame(f http2Frame) error {
 
 	switch f := f.(type) {
 	case *http2SettingsFrame:
+		fmt.Println("http2SettingsFrame")
 		return sc.processSettings(f)
 	case *http2MetaHeadersFrame:
+		fmt.Println("http2MetaHeadersFrame")
 		return sc.processHeaders(f)
 	case *http2WindowUpdateFrame:
+		fmt.Println("http2WindowUpdateFrame")
 		return sc.processWindowUpdate(f)
 	case *http2PingFrame:
+		fmt.Println("http2PingFrame")
 		return sc.processPing(f)
 	case *http2DataFrame:
 		return sc.processData(f)
@@ -5113,6 +5121,7 @@ func (sc *http2serverConn) closeStream(st *http2stream, err error) {
 
 func (sc *http2serverConn) processSettings(f *http2SettingsFrame) error {
 	sc.serveG.check()
+	fmt.Printf("processSettings f.IsAck():%v\n", f.IsAck())
 	if f.IsAck() {
 		sc.unackedSettings--
 		if sc.unackedSettings < 0 {
@@ -5124,12 +5133,14 @@ func (sc *http2serverConn) processSettings(f *http2SettingsFrame) error {
 		return nil
 	}
 	if f.NumSettings() > 100 || f.HasDuplicates() {
+		fmt.Println("http2ConnectionError")
 		// This isn't actually in the spec, but hang up on
 		// suspiciously large settings frames or those with
 		// duplicate entries.
 		return http2ConnectionError(http2ErrCodeProtocol)
 	}
 	if err := f.ForeachSetting(sc.processSetting); err != nil {
+		fmt.Println("processSettings err:", err)
 		return err
 	}
 	// TODO: judging by RFC 7540, Section 6.5.3 each SETTINGS frame should be
@@ -5366,6 +5377,7 @@ func (sc *http2serverConn) processHeaders(f *http2MetaHeadersFrame) error {
 			// processing this frame.
 			return nil
 		}
+
 		// RFC 7540, sec 5.1: If an endpoint receives additional frames, other than
 		// WINDOW_UPDATE, PRIORITY, or RST_STREAM, for a stream that is in
 		// this state, it MUST respond with a stream error (Section 5.4.2) of
