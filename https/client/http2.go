@@ -8,12 +8,15 @@ import (
 	"learn/http/go/net/http"
 	"learn/http/go/net/http2"
 	"log"
+	"runtime"
 	"time"
 )
 
 func main() {
-	clientCertFile := "/Users/wangjian01/Documents/go/learn/http/https/client/client.pem"
-	clientKeyFile := "/Users/wangjian01/Documents/go/learn/http/https/client/client.key"
+	_, fp, _, _ := runtime.Caller(0)
+	dir := getParentDirectory(fp)
+	clientCertFile := fmt.Sprintf("%s/%s", dir, "client.pem")
+	clientKeyFile := fmt.Sprintf("%s/%s", dir, "client.key")
 	caCertFile := "/Users/wangjian01/Documents/go/learn/http/https/CA/ca.pem"
 	var cert tls.Certificate
 	var err error
@@ -21,22 +24,17 @@ func main() {
 		cert, err = tls.LoadX509KeyPair(clientCertFile, clientKeyFile)
 		if err != nil {
 			log.Fatalf("Error creating x509 keypair from client cert file %s and client key file %s", clientCertFile, clientKeyFile)
+			return
 		}
 	}
 	caCert, err := ioutil.ReadFile(caCertFile)
 	if err != nil {
 		fmt.Printf("Error opening cert file %s, Error: %s", caCertFile, err)
+		return
 	}
 	caCertPool := x509.NewCertPool()
 	caCertPool.AppendCertsFromPEM(caCert)
-	/*http 1.1
-	  t := &http.Transport{
-	      TLSClientConfig: &tls.Config{
-	          Certificates: []tls.Certificate{cert},
-	          RootCAs:      caCertPool,
-	      },
-	  }
-	*/
+
 	t := &http2.Transport{
 		TLSClientConfig: &tls.Config{
 			Certificates:       []tls.Certificate{cert},
